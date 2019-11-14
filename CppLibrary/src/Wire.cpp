@@ -24,6 +24,10 @@ extern "C" {
 
 #include "Wire.h"
 
+
+extern "C" static inline bool TWI_FailedAcknowledge( Twi )
+
+
 static inline bool TWI_FailedAcknowledge(Twi *pTwi) {
 	return pTwi->TWI_SR & TWI_SR_NACK;
 }

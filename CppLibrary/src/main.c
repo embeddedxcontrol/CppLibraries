@@ -7,6 +7,8 @@
 
 
 #include <asf.h>
+#include <stdbool.h>
+#include "Wire.h"
 
 
 //For TWI
@@ -26,7 +28,14 @@
 #define LCD_DISPLAYOFF 0x00
 
 static void SetupTwiLcd( void );
+//Cpp functions
+static inline bool TWI_FailedAcknowledge( Twi );
 
+static inline bool CPP_TWI_FailedAcknowledge( Twi *pTwi )
+{
+	bool b = TWI_FailedAcknowledge( *pTwi );
+	return b;
+}
 
 
 static void SetupTwiLcd()
@@ -56,6 +65,8 @@ int main (void)
 	SystemInit();
 	PMC->PMC_PCER0 = 0x0;
 	PMC->PMC_PCER1 = 0x0;
+
+	CPP_TWI_FailedAcknowledge(TWI0);
 
 	SetupTwiLcd();
 
