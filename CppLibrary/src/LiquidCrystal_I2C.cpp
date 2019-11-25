@@ -136,7 +136,7 @@ void LiquidCrystal_I2C::home(){
 
 void LiquidCrystal_I2C::setCursor(uint8_t col, uint8_t row){
 	int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
-	if ( row > (_numlines-1) ) {
+	if ( row > _numlines ) {
 		row = _numlines-1;    // we count rows starting w/0
 	}
 	command(LCD_SETDDRAMADDR | (col + row_offsets[row]));
@@ -211,6 +211,15 @@ void LiquidCrystal_I2C::createChar(uint8_t location, uint8_t charmap[]) {
 	command(LCD_SETCGRAMADDR | (location << 3));
 	for (int i=0; i<8; i++) {
 		write(charmap[i]);
+	}
+}
+
+//createChar with PROGMEM input
+void LiquidCrystal_I2C::createChar(uint8_t location, const char *charmap) {
+	location &= 0x7; // we only have 8 locations 0-7
+	command(LCD_SETCGRAMADDR | (location << 3));
+	for (int i=0; i<8; i++) {
+	    	write(pgm_read_byte_near(charmap++));
 	}
 }
 
