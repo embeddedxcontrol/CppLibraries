@@ -30,15 +30,6 @@
 #define LCD_DISPLAYOFF 0x00
 
 static void SetupTwiLcd( void );
-//Cpp functions
-//static inline bool TWI_FailedAcknowledge( Twi );
-
-//static inline bool CPP_TWI_FailedAcknowledge( Twi *pTwi )
-//{
-	//bool b = TWI_FailedAcknowledge( *pTwi );
-	//return b;
-//}
-
 
 static void SetupTwiLcd()
 {
@@ -50,108 +41,80 @@ static void SetupTwiLcd()
 	twi_settings.smbus = 0;
 
 	//Enable the TWI peripheral clock
-	//PMC->PMC_PCER0 |= (1<<ID_TWI0);
 	PMC->PMC_PCER0 |= (1<<ID_TWI1);
 	//Enable TWI PIOs
+	PIOB->PIO_PER |= PIO_PB12 | PIO_PB13; //Enable Peripheral on B12, B13
 	//PIOA->PIO_ABSR |= PIO_ABSR_P17 | PIO_ABSR_P18;      //Select Peripheral B (TWI) for Peripheral A18, A17
 	PIOB->PIO_ABSR |= PIO_ABSR_P12 | PIO_ABSR_P13;  //Select Peripheral B (TWI) for B12, B13
-	//PIOA->PIO_PER |= PIO_PA17 | PIO_PA18;               //Enable Peripheral on A17, A18
-	PIOB->PIO_PER |= PIO_PB12 | PIO_PB13; //Enable Peripheral on B12, B13
-	//PIOB->PIO_PUER |= PIO_PB12 | PIO_PB13;		        //Enable pull-up resistors on our two communication pins
 	//Enable TWI master mode by calling twi_enable_master_mode if it is a master on the I2C bus
-	//twi_enable_master_mode(TWI1);
 	//Configure the TWI in master mode by calling twi_master_init
 	twi_master_init(TWI1, &twi_settings);
 }
 
 int main (void)
 {
-
+	twi_packet_t i2cdata;
+	uint8_t byteToLcd = 0x0;
+	
 	SystemInit();
+	delay_init(CHIP_FREQ_CPU_MAX);
+	
 	PMC->PMC_PCER0 = 0x0;
 	PMC->PMC_PCER1 = 0x0;
-
 	SetupTwiLcd();
 
 	uint8_t cols = 20;
 	uint8_t lines = 4;
 	uint8_t dotsize = 0x08;
 
-
-
-
-	////void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
-//
-//
-		//// SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
-		//// according to datasheet, we need at least 40ms after power rises above 2.7V
-		//// before sending commands. Arduino can turn on way befer 4.5V so we'll wait 50
-		//delay(50);
-		//
-		//// Now we pull both RS and R/W low to begin commands
-		//expanderWrite(_backlightval);	// reset expanderand turn backlight off (Bit 8 =1)
-		//delay(1000);
-//
-		////put the LCD into 4 bit mode
-		//// this is according to the hitachi HD44780 datasheet
-		//// figure 24, pg 46
-		//
-		//// we start in 8bit mode, try to set 4 bit mode
-		//write4bits(0x03 << 4);
-		//delayMicroseconds(4500); // wait min 4.1ms
-		//
-		//// second try
-		//write4bits(0x03 << 4);
-		//delayMicroseconds(4500); // wait min 4.1ms
-		//
-		//// third go!
-		//write4bits(0x03 << 4);
-		//delayMicroseconds(150);
-		//
-		//// finally, set to 4-bit interface
-		//write4bits(0x02 << 4);
-//
-//
-		//// set # lines, font size, etc.
-		//command(LCD_FUNCTIONSET | _displayfunction);
-		//
-		//// turn the display on with no cursor or blinking default
-		//_displaycontrol = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
-		//display();
-		//
-		//// clear it off
-		//clear();
-		//
-		//// Initialize to default text direction (for roman languages)
-		//_displaymode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
-		//
-		//// set the entry mode
-		//command(LCD_ENTRYMODESET | _displaymode);
-		//
-		//home();
-		
-	
-
-
+	i2cdata.chip = I2C_SLAVE_ADDRESS;
+	i2cdata.addr[0] = 0x0;
+	i2cdata.addr_length = 0;
+	i2cdata.length = 1;
 
 	while(1)
 	{
-			//delay_us(500);
+		/*
+			typedef struct twi_packet {
+			//! TWI address/commands to issue to the other chip (node).
+			uint8_t addr[3];
+			//! Length of the TWI data address segment (1-3 bytes).
+			uint32_t addr_length;
+			//! Where to find the data to be transferred.
+			void *buffer;
+			//! How many bytes do we want to transfer.
+			uint32_t length;
+			//! TWI chip address to communicate with.
+			uint8_t chip;
+			} twi_packet_t;
+		*/
+			
+		byteToLcd = LCD_NOBACKLIGHT;
+		i2cdata.buffer = &byteToLcd;
+			
+		twi_master_write(TWI1,&i2cdata);
 
-			twi_write_byte(TWI1, LCD_NOBACKLIGHT);
+		delay_ms(1000);
+						
+		byteToLcd = LCD_BACKLIGHT;
+		i2cdata.buffer = &byteToLcd;
+			
+		twi_master_write(TWI1, &i2cdata);
+			
+		delay_ms(1000);
 
-			//delay_us(500);
+		byteToLcd = LCD_NOBACKLIGHT;
+		i2cdata.buffer = &byteToLcd;
 
-			twi_write_byte(TWI1, LCD_BACKLIGHT);
-			//twi_master_write(TWI0, )
+		twi_master_write(TWI1, &i2cdata);
 
-			//delay_us(500);
+		delay_ms(1000);
 
-			twi_write_byte(TWI1, LCD_NOBACKLIGHT);
-
-			//delay_us(500);
-
-			twi_write_byte(TWI1, LCD_BACKLIGHT);
+		byteToLcd = LCD_BACKLIGHT;
+		i2cdata.buffer = &byteToLcd;
+		twi_master_write(TWI1, &i2cdata);
+			
+		delay_ms(1000);
 	}
 
 }

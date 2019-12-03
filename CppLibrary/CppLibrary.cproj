@@ -303,11 +303,13 @@
     <ListValues>
       <Value>libarm_cortexM3l_math</Value>
       <Value>libm</Value>
+      <Value>libarm_cortexM3l_math.a</Value>
     </ListValues>
   </armgcc.linker.libraries.Libraries>
   <armgcc.linker.libraries.LibrarySearchPaths>
     <ListValues>
       <Value>../src/ASF/thirdparty/CMSIS/Lib/GCC</Value>
+      <Value>C:\Users\Subbu\Documents\Projects\embeddedXcontrol\CppLibraries_1\CppLibrary\src\ASF\thirdparty\CMSIS\Lib</Value>
     </ListValues>
   </armgcc.linker.libraries.LibrarySearchPaths>
   <armgcc.linker.optimization.GarbageCollectUnusedSections>True</armgcc.linker.optimization.GarbageCollectUnusedSections>
@@ -437,11 +439,13 @@
     <ListValues>
       <Value>libarm_cortexM3l_math</Value>
       <Value>libm</Value>
+      <Value>libarm_cortexM3l_math.a</Value>
     </ListValues>
   </armgcc.linker.libraries.Libraries>
   <armgcc.linker.libraries.LibrarySearchPaths>
     <ListValues>
       <Value>../src/ASF/thirdparty/CMSIS/Lib/GCC</Value>
+      <Value>C:\Users\Subbu\Documents\Projects\embeddedXcontrol\CppLibraries_1\CppLibrary\src\ASF\thirdparty\CMSIS\Lib</Value>
     </ListValues>
   </armgcc.linker.libraries.LibrarySearchPaths>
   <armgcc.linker.optimization.GarbageCollectUnusedSections>True</armgcc.linker.optimization.GarbageCollectUnusedSections>
