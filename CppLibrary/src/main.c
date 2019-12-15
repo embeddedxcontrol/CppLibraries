@@ -42,19 +42,27 @@ static void SetupTwiLcd()
 
 	//Enable the TWI peripheral clock
 	PMC->PMC_PCER0 |= (1<<ID_TWI1);
+	//Enable PIO peripheral clock
+	PMC->PMC_PCER0 |= (1<<ID_PIOB);
 	//Enable TWI PIOs
-	PIOB->PIO_PER |= PIO_PB12 | PIO_PB13; //Enable Peripheral on B12, B13
+	PIOB->PIO_PDR = PIO_PB12 | PIO_PB13;
+	PIOB->PIO_ODR = PIO_PB12 | PIO_PB13;
+	//PIOB->PIO_PER = PIO_PB12 | PIO_PB13; //Enable Peripheral on B12, B13
 	//PIOA->PIO_ABSR |= PIO_ABSR_P17 | PIO_ABSR_P18;      //Select Peripheral B (TWI) for Peripheral A18, A17
-	PIOB->PIO_ABSR |= PIO_ABSR_P12 | PIO_ABSR_P13;  //Select Peripheral B (TWI) for B12, B13
+	//PIOB->PIO_ABSR |= PIO_ABSR_P12 | PIO_ABSR_P13;  //Select Peripheral B (TWI) for B12, B13
+	PIOB->PIO_ABSR = 0x0;
+		
 	//Enable TWI master mode by calling twi_enable_master_mode if it is a master on the I2C bus
 	//Configure the TWI in master mode by calling twi_master_init
 	twi_master_init(TWI1, &twi_settings);
 }
 
+
 int main (void)
 {
 	twi_packet_t i2cdata;
-	uint8_t byteToLcd = 0x0;
+	//uint8_t byteToLcd = 0x0;
+	uint8_t byteToLcd[1];	
 	
 	SystemInit();
 	delay_init(CHIP_FREQ_CPU_MAX);
@@ -89,32 +97,32 @@ int main (void)
 			} twi_packet_t;
 		*/
 			
-		byteToLcd = LCD_NOBACKLIGHT;
+		byteToLcd[0] = 0x1;
 		i2cdata.buffer = &byteToLcd;
 			
 		twi_master_write(TWI1,&i2cdata);
 
-		delay_ms(1000);
+		delay_ms(10);
 						
-		byteToLcd = LCD_BACKLIGHT;
+		byteToLcd[0] = 0x8;
 		i2cdata.buffer = &byteToLcd;
 			
 		twi_master_write(TWI1, &i2cdata);
 			
-		delay_ms(1000);
+		delay_ms(10);
 
-		byteToLcd = LCD_NOBACKLIGHT;
+		byteToLcd[0] = 0x1;
 		i2cdata.buffer = &byteToLcd;
 
 		twi_master_write(TWI1, &i2cdata);
 
-		delay_ms(1000);
+		delay_ms(10);
 
-		byteToLcd = LCD_BACKLIGHT;
+		byteToLcd[0] = 0x8;
 		i2cdata.buffer = &byteToLcd;
 		twi_master_write(TWI1, &i2cdata);
 			
-		delay_ms(1000);
+		delay_ms(10);
 	}
 
 }
